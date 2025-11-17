@@ -10,6 +10,8 @@ def update_q_table(Q, s, a, r, sprime, alpha, gamma):
     the reward, the next state sprime, alpha the learning rate and gamma the discount factor.
     Return the same input Q but updated for the pair s and a.
     """
+    Q[s, a] = Q[s, a] + alpha * (r + gamma * np.max(Q[sprime, :]) - Q[s, a])
+    return Q    
 
 
 def epsilon_greedy(Q, s, epsilone):
@@ -18,6 +20,11 @@ def epsilon_greedy(Q, s, epsilone):
     Takes as unput the Q function for all states, a state s, and epsilon.
     It should return the action to take following the epsilon greedy algorithm.
     """
+    Q_ = Q[s, :]
+    if np.random.rand() < epsilone:
+        return np.random.randint(len(Q_))
+    else:
+        return np.argmax(Q_)    
 
 
 if __name__ == "__main__":
@@ -69,8 +76,25 @@ if __name__ == "__main__":
     
     """
     
-    Evaluate the q-learning algorihtm
+    Evaluate the q-learning algorihtm (ici on ne fais plus la mise à jour de la Q-table mais on utilise la Q-table apprise pour prendre les actions et compteter le nombre ditérations pour terminer l'épisode)
     
     """
+    n_test_epochs = 10
+    for e in range(n_test_epochs):
+        S, _ = env.reset()
+        done = False
+        itr = 0
+        while not done:
+            A = np.argmax(Q[S, :])
+            S, R, done, _, info = env.step(A)
+            env.render()
+            itr += 1
+        print("Test episode #", e, " : number of iterations = ", itr)
+        plt.plot(rewards)
+    plt.xlabel("Epochs")
+    plt.ylabel("Rewards")
+    plt.title("Rewards over Epochs")
+    plt.show()
+    
 
     env.close()
